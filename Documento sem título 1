@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GameForge — Crie jogos grátis (Protótipo)</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--text:#e6eef6}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#061122 0%,#08131b 100%);font-family:Inter,system-ui,Segoe UI,Arial}
+    .wrap{max-width:1100px;margin:28px auto;padding:18px;color:var(--text)}
+    header{display:flex;gap:16px;align-items:center}
+    h1{margin:0;font-size:20px}
+    .top{display:flex;gap:12px;margin-top:14px}
+    .card{background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .left{flex:1;min-width:420px}
+    textarea{width:100%;height:360px;background:#031022;color:var(--text);border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,0.03);resize:vertical}
+    .controls{display:flex;gap:8px;margin-top:8px}
+    button{background:var(--accent);border:none;padding:10px 12px;border-radius:8px;color:#002;cursor:pointer}
+    .templates{display:flex;gap:8px;flex-wrap:wrap}
+    .template{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer}
+    .right{width:380px}
+    iframe#preview{width:100%;height:480px;border:1px solid rgba(255,255,255,0.03);border-radius:8px}
+    .small{font-size:13px;color:#c9d7e6}
+    footer{margin-top:12px;font-size:13px;color:#9fb6c6}
+    a.link{color:var(--accent)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="card" style="padding:10px 12px"><strong>GameForge</strong></div>
+      <div>
+        <h1>GameForge — crie jogos simples grátis (protótipo)</h1>
+        <div class="small">Cole código do jogo, experimente templates e exporte um projeto pronto para publicar.</div>
+      </div>
+    </header>
+
+    <div class="top">
+      <div class="left card">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div><strong>Editor (cole aqui o código do seu jogo)</strong></div>
+          <div class="small">Use HTML + JS (tem templates com Phaser 3)</div>
+        </div>
+
+        <textarea id="editor">// Cole ou escreva aqui o código principal do seu jogo em JavaScript.
+// Use os templates pré-definidos no painel direito (Plataforma / TopDown).
+</textarea>
+
+        <div class="controls">
+          <button id="runBtn">Executar (abrir preview)</button>
+          <button id="downloadBtn">Exportar projeto (ZIP)</button>
+          <button id="resetBtn">Limpar editor</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <strong>Templates rápidos</strong>
+          <div class="templates" id="templates">
+            <div class="template" data-template="platform">Plataforma (Phaser)</div>
+            <div class="template" data-template="topdown">Top‑Down (Phaser)</div>
+            <div class="template" data-template="blank">Página em branco (HTML + JS)</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="small card">
+          <strong>Observações</strong>
+          <ul>
+            <li>Este é um protótipo: jogos 3D complexos (mundo aberto estilo GTA) não são gerados automaticamente.</li>
+            <li>Você pode colar os scripts que eu te dei (ex.: scripts C# do Unity) no campo, mas a execução no navegador exige JS/HTML.</li>
+            <li>Para publicar: exporte o ZIP e faça deploy em <em>GitHub Pages</em> ou <em>Netlify</em> (passo‑a‑passo abaixo).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="right card">
+        <div><strong>Preview</strong></div>
+        <iframe id="preview"></iframe>
+
+        <div style="margin-top:10px">
+          <strong>Como funciona</strong>
+          <div class="small">1) Escolha um template → 2) Modifique no editor → 3) Executar para ver no preview → 4) Exportar ZIP e publicar.</div>
+        </div>
+
+        <div style="margin-top:8px" class="small card">
+          <strong>Exportar & Publicar</strong>
+          <ol>
+            <li>Baixe o ZIP (botão Exportar)</li>
+            <li>Crie um repositório no GitHub e envie os arquivos</li>
+            <li>No GitHub vá em Settings → Pages → escolha branch main → Salvar</li>
+            <li>Ou use Netlify/ Vercel e arraste o ZIP</li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="card">
+      <div>Protótipo gerado por ChatGPT • Conteúdo em Português • Não faz deploy automático — fornece artefatos e instruções.</div>
+    </footer>
+  </div>
+
+  <script>
+    // Templates internos (Phaser 3 — CDN)
+    const templates = {
+      platform: `<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Plataforma</title><script src='https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js'></script><style>body{margin:0;background:#222}</style></head><body><div id='game'></div><script>
+const config = {type: Phaser.AUTO,width:800,height:600,physics:{default:'arcade', arcade:{gravity:{y:800}}},scene:{preload,create,update}};
+let player, cursors;
+function preload(){this.load.image('ground','https://labs.phaser.io/assets/sprites/platform.png');this.load.image('dude','https://labs.phaser.io/assets/sprites/phaser-dude.png');}
+function create(){this.add.rectangle(400,300,800,600,0x87ceeb);
+  const platforms = this.physics.add.staticGroup();
+  platforms.create(400,568,'ground').setScale(2).refreshBody();
+  player = this.physics.add.sprite(100,450,'dude').setScale(0.8);
+  player.setCollideWorldBounds(true);
+  this.physics.add.collider(player, platforms);
+  cursors = this.input.keyboard.createCursorKeys();}
+function update(){if(cursors.left.isDown){player.setVelocityX(-200);}else if(cursors.right.isDown){player.setVelocityX(200);}else{player.setVelocityX(0);}if(cursors.up.isDown && player.body.touching.down){player.setVelocityY(-450);}}
+new Phaser.Game(config);
+</script></body></html>`,
+
+      topdown: `<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>TopDown</title><script src='https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js'></script><style>body{margin:0;background:#111}</style></head><body><script>
+const config={type:Phaser.AUTO,width:800,height:600,physics:{default:'arcade'},scene:{preload,create,update}};let player,cursors;function preload(){this.load.image('tiles','https://labs.phaser.io/assets/tilesets/desert.png');this.load.image('player','https://labs.phaser.io/assets/sprites/phaser-dude.png');}
+function create(){player=this.physics.add.sprite(400,300,'player').setScale(0.8);player.setCollideWorldBounds(true);cursors=this.input.keyboard.createCursorKeys();}
+function update(){let speed=200;player.setVelocity(0);if(cursors.left.isDown)player.setVelocityX(-speed);if(cursors.right.isDown)player.setVelocityX(speed);if(cursors.up.isDown)player.setVelocityY(-speed);if(cursors.down.isDown)player.setVelocityY(speed);}new Phaser.Game(config);
+</script></body></html>`,
+
+      blank: `<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Blank</title></head><body><script>
+// Código JS do seu jogo aqui. Use canvas ou frameworks (Phaser, Three.js ...)
+console.log('Blank project ready');
+</script></body></html>`
+    };
+
+    const editor = document.getElementById('editor');
+    const preview = document.getElementById('preview');
+    const runBtn = document.getElementById('runBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    document.getElementById('templates').addEventListener('click', e=>{
+      const t = e.target.getAttribute('data-template');
+      if(!t) return;
+      editor.value = templates[t];
+    });
+
+    runBtn.addEventListener('click', ()=>{
+      const content = editor.value;
+      const blob = new Blob([content], {type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      preview.src = url;
+    });
+
+    resetBtn.addEventListener('click', ()=>editor.value='');
+
+    // Export ZIP using JSZip CDN dynamically
+    downloadBtn.addEventListener('click', async ()=>{
+      const code = editor.value;
+      const zipUrl = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+      await loadScript(zipUrl);
+      const JSZip = window.JSZip;
+      const zip = new JSZip();
+      zip.file('index.html', code);
+      const content = await zip.generateAsync({type:'blob'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(content);
+      a.download = 'game-project.zip';
+      a.click();
+    });
+
+    function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+    }
+  </script>
+</body>
+</html>
+
